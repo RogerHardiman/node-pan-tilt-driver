@@ -18,10 +18,18 @@
 //   The library autodetects Pimoroni by checking i2c address 0x15 and Waveshare/PCA9685 by checking i2c address 0x40
 
 // ABSOLUTE POSITIONING
+// Pan=0, Tilt=0 has the camera looking forword.
+// Pan of +90 makes the Pi Camera look to the left
+// Pan of -90 makes the Pi Camera look to the right
+// Tilt of -80 makes the Pi Cammera look up
+// Tilt of +80 makes the Pi Cammera look down
+// (The positive and negative directions are the same as the Pimoroni Python driver)
+
 //   pan(angle),                     // angle between -90 and 90
 //   servo_one(angle)                // angle between -90 and 90
 //   tilt(angle)                     // angle between -80 and 80
 //   servo_two(angle)                // angle between -80 and 80
+//
 //
 // CONTINUOUS MOVE API (START AND STOP COMMANDS)
 //   pan_left(speed)                 // start moving with a speed from 0 to 15. 0 means stop
@@ -45,6 +53,10 @@ const SERVO_MIN_PWM = 575;
 const SERVO_MAX_PWM = 2325;
 
 const WAVESHARE_I2C_ADDRESS = 0x40; // can be changed with resisters on the PCB
+const __LED0_ON_L = 0x06;
+const __LED0_ON_H = 0x07;
+const __LED0_OFF_L = 0x08;
+const __LED0_OFF_H = 0x09;
 
 
 class PanTiltHAT {
@@ -60,7 +72,43 @@ class PanTiltHAT {
       var tilt_pwm = this.i2c.readWordSync(PIMORONI_I2C_ADDRESS, PIMORONI_TILT_SERVO_REGISTER);
       this.manufacturer = "pimoroni"
     } catch (error) {
-      this.manufacturer = "waveshare";
+      this.manufacturer = "unknown";
+    }
+
+    if (this.manufacturer === "unknown") {
+      try {
+        const REG_MODE1 = 0x00;
+        const REG_MODE2 = 0x01;
+        const REG_PRESCALE = 0xFE;
+        this.i2c.writeByteSync(WAVESHARE_I2C_ADDRESS, REG_MODE1, 0x00);
+
+        let prescaleval = 25000000; // 25 MHz
+        prescaleval /= 4096; // 12 bit
+        prescaleval /= 50;  // 50 Hz
+        prescaleval -= 1.0;
+
+        prescaleval = Math.floor(prescaleval + 0.5);
+
+        let oldmode = this.i2c.readByteSync(WAVESHARE_I2C_ADDRESS, REG_MODE1);
+
+        let newmode = (oldmode & 0x7F) | 0x10; // Activate sleep
+        this.i2c.writeByteSync(WAVESHARE_I2C_ADDRESS, REG_MODE1, newmode);
+
+        this.i2c.writeByteSync(WAVESHARE_I2C_ADDRESS, REG_PRESCALE, prescaleval);
+
+        this.i2c.writeByteSync(WAVESHARE_I2C_ADDRESS, REG_MODE1, oldmode);
+
+        //DEV_Delay_ms(200);
+
+        this.i2c.writeByteSync(WAVESHARE_I2C_ADDRESS, REG_MODE1, oldmode | 0x80);
+
+        this.i2c.writeByteSync(WAVESHARE_I2C_ADDRESS, REG_MODE2, 0x04);
+
+        this.manufacturer = "waveshare";
+      } catch (error) {
+        console.log("Error initialising waveshare " + error);
+        this.manufacturer = "unknown";
+      }
     }
 
     // current position in degrees and current speed (used for continuous move API)
@@ -166,9 +214,7 @@ class PanTiltHAT {
   // Every time the Continouous Move API callback is fired, we calculate the new angle for the servos
   // using the current angle and current speed
   continuous_move_callback() {
-    console.log("inside callback " + this.pan_speed);
     if (this.pan_speed === 0 && this.tilt_speed === 0) return;
-    console.log("inside callback 2");
     let new_pan_position = this.pan_position + (this.pan_speed / 10);
     let new_tilt_position = this.tilt_position + (this.tilt_speed / 10);
     // range check
@@ -190,7 +236,6 @@ class PanTiltHAT {
     }
 
     if (new_pan_position != this.pan_position) {
-      console.log("aaa")
       this.pan(new_pan_position);
     }
     if (new_tilt_position != this.tilt_position) {
@@ -202,14 +247,12 @@ class PanTiltHAT {
     if (speed > 15) speed = 15;
     if (speed < 0) speed = 0;
     this.pan_speed = speed;
-    console.log(">>>>>>" + this.pan_speed);
   }
 
   pan_right(speed) {
     if (speed > 15) speed = 15;
     if (speed < 0) speed = 0;
     this.pan_speed = -speed;
-    console.log(">>>>>>" + this.pan_speed);
   }
 
   tilt_up(speed) {
@@ -247,7 +290,7 @@ class PanTiltHAT {
   //
   //////////////////////////////////////////////////
   pimoroni_update_servo_config() {
-    console.log("pimoroni update servo config pan=" + this.pan_servo_enabled + " tilt=" + this.tilt_servo_enabled);
+    //console.log("pimoroni update servo config pan=" + this.pan_servo_enabled + " tilt=" + this.tilt_servo_enabled);
     let config_byte = 0;
     if (this.pan_servo_enabled) config_byte = config_byte | 0x01;
     if (this.tilt_servo_enabled) config_byte = config_byte | 0x02;
@@ -255,27 +298,43 @@ class PanTiltHAT {
   }
 
   pimoroni_send_pan_pwm(pwm) {
-    console.log("pimoroni set pan pwm to " + pwm);
+    //console.log("pimoroni set pan pwm to " + pwm);
     this.i2c.writeWordSync(PIMORONI_I2C_ADDRESS, PIMORONI_PAN_SERVO_REGISTER, pwm);
   }
 
   pimoroni_send_tilt_pwm(pwm) {
-    console.log("pimoroni set tilt pwm to " + pwm);
+    //console.log("pimoroni set tilt pwm to " + pwm);
     this.i2c.writeWordSync(PIMORONI_I2C_ADDRESS, PIMORONI_TILT_SERVO_REGISTER, pwm);
   }
 
 
 
   waveshare_update_servo_config() {
-    console.log("pimoroni update servo config pan=" + this.pan_servo_enabled + " tilt=" + this.tilt_servo_enabled);
+    //console.log("waveshare update servo config pan=" + this.pan_servo_enabled + " tilt=" + this.tilt_servo_enabled);
   }
 
   waveshare_send_pan_pwm(pwm) {
-    console.log("waveshare set pan pwm to " + pwm);
+    //console.log("waveshare set pan pwm to " + pwm);
+    let on = 0;
+    let off = pwm * 4096 / 20000;     // PWM frequency is 50HZ,the period is 20000us, the resolution 12 bit
+    let channel = 1;
+
+    this.i2c.writeByteSync(WAVESHARE_I2C_ADDRESS, __LED0_ON_L + 4 * channel, on & 0xFF);
+    this.i2c.writeByteSync(WAVESHARE_I2C_ADDRESS, __LED0_ON_H + 4 * channel, on >> 8);
+    this.i2c.writeByteSync(WAVESHARE_I2C_ADDRESS, __LED0_OFF_L + 4 * channel, off & 0xFF)
+    this.i2c.writeByteSync(WAVESHARE_I2C_ADDRESS, __LED0_OFF_H + 4 * channel, off >> 8)
   }
 
   waveshare_send_tilt_pwm(pwm) {
-    console.log("waveshare set tilt pwm to " + pwm);
+    //console.log("waveshare set tilt pwm to " + pwm);
+    let on = 0;
+    let off = pwm * 4096 / 20000;     // PWM frequency is 50HZ,the period is 20000us, the resolution 12 bit
+    let channel = 0;
+
+    this.i2c.writeByteSync(WAVESHARE_I2C_ADDRESS, __LED0_ON_L + 4 * channel, on & 0xFF);
+    this.i2c.writeByteSync(WAVESHARE_I2C_ADDRESS, __LED0_ON_H + 4 * channel, on >> 8);
+    this.i2c.writeByteSync(WAVESHARE_I2C_ADDRESS, __LED0_OFF_L + 4 * channel, off & 0xFF)
+    this.i2c.writeByteSync(WAVESHARE_I2C_ADDRESS, __LED0_OFF_H + 4 * channel, off >> 8)
   }
 
 }
