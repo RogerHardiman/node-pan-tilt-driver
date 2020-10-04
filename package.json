@@ -4,7 +4,7 @@
   "description": "Pimoroni and Waveshare Pan Tilt HAT control for NodeJS",
   "main": "pan-tilt-hat.js",
   "scripts": {
-    "test": "mocha"
+    "test": "node test/test.js"
   },
   "keywords": [
     "Pimoroni",
