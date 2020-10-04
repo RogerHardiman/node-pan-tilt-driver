@@ -13,8 +13,8 @@ var pan_tilt = new PanTiltHAT();
 flow.series([
     // TEST - Goto Position
     function (completion_callback) {
-        console.log('Goto position Pan Right(+80), Tilt 0');
-        pan_tilt.pan(80);
+        console.log('Goto position Pan Right(-80), Tilt 0');
+        pan_tilt.pan(-80);
         pan_tilt.tilt(0);
         completion_callback();
     },
