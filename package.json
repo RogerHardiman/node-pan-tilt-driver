@@ -1,0 +1,36 @@
+{
+  "name": "pan-tilt-hat-2",
+  "version": "1.0.0",
+  "description": "Pimoroni and Waveshare Pan Tilt HAT control for NodeJS",
+  "main": "pan-tilt-hat.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "keywords": [
+    "Pimoroni",
+    "Waveshare",
+    "Pan",
+    "Tilt",
+    "Pan-Tilt",
+    "HAT",
+    "Raspberry",
+    "Pi",
+    "PTZ",
+    "servo",
+    "i2c"
+  ],
+  "homepage": "http://github.com/RogerHardiman/node-pan-tilt-hat-2",
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/RogerHardiman/node-pan-tilt-hat-2"
+  },
+  "author": "Roger Hardiman",
+  "license": "MIT",
+  "dependencies": {
+    "i2c-bus": "5.2.0",
+    "pca9685": "4.0.3"
+  },
+  "devDependencies": {
+    "nimble": "~0.0.2"
+  }
+}
