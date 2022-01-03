@@ -10,7 +10,7 @@ All boards have some similarities and some differences
 |Feature|Pimoroni|Waveshare|Arducam (Under Development)|
 |-------|--------|---------|---------|
 |Designed for the Raspberry Pi|Yes|Yes|Yes|
-|Servo Type|SG90 analogue servo|WS-SG90 analogue servo|PES GH-S37D digital servo|
+|Servo Type|Tower Pro SG90|Waveshare WS-SG90|PES GH-S37D digital servo|
 |Control Chip|PIC16F1503 with custom firmware on the i2c bus. PIC generates the PWM signals|Standard PCA9685 PWM/LED controller on the i2c bus|Standard PCA9685 PWM/LED controller on the i2c bus|
 |I2C address|0x15|0x40 (with ability to be changed)|TBC|
 |Extra feature|Has a 3rd output for PWM controlled LEDs and Lights and NeoPixels (this driver does not control the LED/Lights)|Has a Light Sensor on the i2c bus (this driver does not read the light level sensor)|None|
