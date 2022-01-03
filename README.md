@@ -1,5 +1,6 @@
 # node-pan-tilt-driver
 NodeJS driver for the Pan-Tilt HAT from _Pimoroni_, the Pan-Tilt HAT from _Waveshare_ and the Pan-Tilt Platform from _Arducam_
+100% Javascript. No need for any external Python libraries.
 
 There are two makes of Pan-Tilt HAT board for the Raspberry Pi, one made by _Pimoroni_ in the UK and one made by _Waveshare_ in China.
 There is also a Pan-Tilt platform designed for the Pi and the Jetson Nano made by Arducam
