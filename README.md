@@ -13,7 +13,7 @@ All boards have some similarities and some differences
 |Servo Type|SG90 analogue servo|WS-SG90 analogue servo|PES GH-S37D digital servo|
 |Control Chip|PIC16F1503 with custom firmware on the i2c bus. PIC generates the PWM signals|Standard PCA9685 PWM/LED controller on the i2c bus|Standard PCA9685 PWM/LED controller on the i2c bus|
 |I2C address|0x15|0x40 (with ability to be changed)|TBC|
-|Extra feature|Has a 3rd output for PWM controlled LEDs and Lights and NeoPixels (this driver does not control the LED/Light control)|Has a Light Sensor on |the i2c bus (this driver does not read the light level sensor)|None|
+|Extra feature|Has a 3rd output for PWM controlled LEDs and Lights and NeoPixels (this driver does not control the LED/Light control)|Has a Light Sensor on the i2c bus (this driver does not read the light level sensor)|None|
 |Extra features|Brings the I2C, UART, Broadcom PWM and SPI signals to the edge of the board|Has tall header pins to allow access to all 40 Pi pins. Has solder pads to allow the i2c address to be changed|Can sit to the side of the Pi (does not need to go on top) Uses jumper wires to connect to a Pi's i2c bus|
 |Pi HAT Standard Compliance|Yes, has the HAT EEPROM. The Pi device tree will show the Pimoroni Pan-Tilt HAT is connected|No. Does not implement the HAT identification EEPROM|
 |Country of origin|UK|China|N/A. Not a HAT|
